@@ -1,0 +1,97 @@
+#This code is to interact with extremophilic proteins obtained from the NCBI library
+
+def search_protein_in_file(file_name, string_to_search):
+    #Search for the given string in file and return lines containing that string
+    list_of_results = []
+    # Open the file in read only mode
+    with open(file_name, 'r') as read_obj:
+        # Read all lines in the file one by one
+        for line in read_obj:
+            # For each line, check if line contains the string
+            if string_to_search in line:
+                # If yes, then add line in the list
+                list_of_results.append((line.rstrip()))
+    # Return list containing lines where string is found
+    return list_of_results
+
+def cut_down (list_name):
+    #Only keeps the name of the protein
+    new_list = []
+    for a_string in list_name:
+        #Replaces the line identifier with nothing
+        new_string = a_string.replace("DEFINITION  ", "")
+        new_list.append(new_string)
+    return new_list
+
+def intersection (list1, list2):
+    #Find the proteins present in two lists (ie. 2 evironments)
+    list1_as_set = set(list1)
+    intersection = list1_as_set.intersection(list2)
+    intersection_as_list = list(intersection)
+    return intersection_as_list
+def file_to_string (filename):
+    file = open(filename)
+    line = file.read().replace("\n", "")
+    file.close()
+    return(line)
+
+def get_proteins_and_twins (filename):
+    headings = []
+    test = ''
+    start = 0
+    newlist = []
+    with open(filename) as f:
+        for ln in f:
+            if start == 1:
+                if ln.startswith('>'):
+                    start = 0
+                    continue
+                headings.append(ln.rstrip())
+                string = ''.join(headings)
+            if ln.startswith('Sequences producing significant alignments:'):
+                start = 1
+            if ln.startswith('Query= '):
+                headings.append(ln.rstrip())
+            my_results = [x for x in headings if x]
+            my_string = ' $ '.join(my_results)
+    return my_string
+
+def Convert(string):
+    li = list(string.split("Query= "))
+    clean_list = [x for x in li if x]
+    return clean_list
+
+def Nbr_of_sims (list_name):
+    list_of_nbr_similarities = []
+    new_nbr = ''
+    for i in list_name:
+        new_nbr = i.count('$')
+        list_of_nbr_similarities.append(new_nbr)
+    for n in range(len(list_of_nbr_similarities)-1):
+        list_of_nbr_similarities[n] = list_of_nbr_similarities[n] - 1
+    return list_of_nbr_similarities
+    
+    #Venn Diagrm
+    pip install venn
+    
+    from venn import venn
+from matplotlib.pyplot import subplots
+from itertools import chain, islice
+from string import ascii_uppercase
+from numpy.random import choice
+
+_, top_axs = subplots(ncols=3, nrows=1, figsize=(100, 25))
+_, bot_axs = subplots(ncols=2, nrows=1, figsize=(100, 50))
+cmaps = ["cool", list("rgb"), "plasma", "viridis", "Set1"]
+letters = iter(ascii_uppercase)
+
+for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
+    dataset_dict = {
+    "acidophile" : set(acid_proteins),
+    "alkaliphile" : set(alkali_proteins),
+    #"barophile" : {'Chain B, 3-isopropylmalate dehydrogenase.', 'Chain A, 3-isopropylmalate dehydrogenase.', 'Chain A, 3-isopropylmalate dehydrogenase.', 'Chain A, 3-isopropylmalate dehydrogenase.', 'exodeoxyribonuclease V subunit [Photobacterium profundum SS9].', 'exodeoxyribonuclease V subunit, partial [Photobacterium profundum', '3-isopropylmalate dehydrogenase [Shewanella benthica].', 'malate dehydrogenase [Moritella sp. 2D2].'},
+    "halophile" : set(halo_proteins),
+    "thermophile" : set(thermo_proteins),
+    "cryophile" : set(cryo_proteins)
+    }
+    venn(dataset_dict, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
