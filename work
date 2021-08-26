@@ -1,6 +1,6 @@
 #This code is to interact with extremophilic proteins obtained from the NCBI library
 
-def search_protein_in_file(file_name, string_to_search):
+def search_word_in_file(file_name, string_to_search):
     #Search for the given string in file and return lines containing that string
     list_of_results = []
     # Open the file in read only mode
@@ -14,12 +14,21 @@ def search_protein_in_file(file_name, string_to_search):
     # Return list containing lines where string is found
     return list_of_results
 
-def cut_down (list_name):
+def only_protein_names (list_name):
+    converted_list = []
+    for x in list_name:
+        stripped = x.split(' ', 1)
+        new_string = [x for x in stripped if ">" not in x]
+        converted_list.append(new_string)
+        list_of_string = [''.join(element) for element in converted_list]
+    return (list_of_string)  
+
+def cut_down (list_name, word_replace):
     #Only keeps the name of the protein
     new_list = []
     for a_string in list_name:
         #Replaces the line identifier with nothing
-        new_string = a_string.replace("DEFINITION  ", "")
+        new_string = a_string.replace(word_replace, "")
         new_list.append(new_string)
     return new_list
 
@@ -29,6 +38,7 @@ def intersection (list1, list2):
     intersection = list1_as_set.intersection(list2)
     intersection_as_list = list(intersection)
     return intersection_as_list
+
 def file_to_string (filename):
     file = open(filename)
     line = file.read().replace("\n", "")
@@ -70,17 +80,64 @@ def Nbr_of_sims (list_name):
     for n in range(len(list_of_nbr_similarities)-1):
         list_of_nbr_similarities[n] = list_of_nbr_similarities[n] - 1
     return list_of_nbr_similarities
+
+##############################################################################
+
+#extract organism names from genpept files
+
+baro_new_o = search_word_in_file("halo_sequence.gp", "ORIGIN")
+acid_new_o = search_word_in_file("acid_sequence.gp", "ORIGIN")
+alkali_new_o = search_word_in_file("alkali_sequence.gp", "ORIGIN")
+thermo_new_o = search_word_in_file("sequence_thermo3.gp", "ORIGIN")
+cryo_new_o = search_word_in_file("sequence_cryo.gp", "ORIGIN")
+
+baro_organisms = cut_down(baro_new_o, "ORIGIN  ")
+halo_organisms = cut_down(halo_new_o, "ORIGIN  ")
+acid_organisms = cut_down(acid_new_o, "ORIGIN  ")
+alkali_organisms = cut_down(alkali_new_o, "ORIGIN  ")
+thermo_organisms = cut_down(thermo_new_o, "ORIGIN  ")
+cryo_organisms = cut_down(cryo_new_o, "ORIGIN  ")
+
+#find number of organisms with proteins in five environment
+
+two_o = intersection(acid_organisms, halo_organisms
+three_o = intersection(two_o
+
+#extract protein names from genpept files
+
+baro_new = search_word_in_file("halo_sequence.gp", "DEFINITION")
+acid_new = search_word_in_file("acid_sequence.gp", "DEFINITION")
+alkali_new = search_word_in_file("alkali_sequence.gp", "DEFINITION")
+thermo_new = search_word_in_file("sequence_thermo3.gp", "DEFINITION")
+cryo_new = search_word_in_file("sequence_cryo.gp", "DEFINITION")
+
+baro_proteins = cut_down(baro_new, "DEFINITION  ")
+halo_proteins = cut_down(halo_new, "DEFINITION  ")
+acid_proteins = cut_down(acid_new, "DEFINITION  ")
+alkali_proteins = cut_down(alkali_new, "DEFINITION  ")
+thermo_proteins = cut_down(thermo_new, "DEFINITION  ")
+cryo_proteins = cut_down(cryo_new, "DEFINITION  ")
+
+#find number of proteins in 5 environments (without barophiles)
+
+two_p = intersection(acid_proteins, halo_proteins)
+three_p = intersection(two_p, thermo_proteins)
+four_p = intersection(three_p, cryo_proteins)
+five_p = intersection(four_p, alkali_proteins)
+
+print(len(five_p))
+
+##############################################################################
+
+#Venn Diagrm
+pip install venn
     
-    #Venn Diagrm
-    pip install venn
-    
-    from venn import venn
+from venn import venn
 from matplotlib.pyplot import subplots
 from itertools import chain, islice
 from string import ascii_uppercase
 from numpy.random import choice
 
-_, top_axs = subplots(ncols=3, nrows=1, figsize=(100, 25))
 _, bot_axs = subplots(ncols=2, nrows=1, figsize=(100, 50))
 cmaps = ["cool", list("rgb"), "plasma", "viridis", "Set1"]
 letters = iter(ascii_uppercase)
@@ -89,9 +146,12 @@ for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
     dataset_dict = {
     "acidophile" : set(acid_proteins),
     "alkaliphile" : set(alkali_proteins),
-    #"barophile" : {'Chain B, 3-isopropylmalate dehydrogenase.', 'Chain A, 3-isopropylmalate dehydrogenase.', 'Chain A, 3-isopropylmalate dehydrogenase.', 'Chain A, 3-isopropylmalate dehydrogenase.', 'exodeoxyribonuclease V subunit [Photobacterium profundum SS9].', 'exodeoxyribonuclease V subunit, partial [Photobacterium profundum', '3-isopropylmalate dehydrogenase [Shewanella benthica].', 'malate dehydrogenase [Moritella sp. 2D2].'},
+    #"barophile" : set(baro_proteins), ## This one is optional. WIth 6 environments, the venn obtained are messy and hard to interpret
     "halophile" : set(halo_proteins),
     "thermophile" : set(thermo_proteins),
     "cryophile" : set(cryo_proteins)
     }
     venn(dataset_dict, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
+
+##############################################################################
+
