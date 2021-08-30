@@ -1,7 +1,6 @@
 #This code is to interact with extremophilic proteins obtained from the NCBI library
 
-def search_word_in_file(file_name, string_to_search):
-    #Search for the given string in file and return lines containing that string
+def search_protein_in_file(file_name, string_to_search):
     list_of_results = []
     # Open the file in read only mode
     with open(file_name, 'r') as read_obj:
@@ -9,7 +8,7 @@ def search_word_in_file(file_name, string_to_search):
         for line in read_obj:
             # For each line, check if line contains the string
             if string_to_search in line:
-                # If yes, then add line in the list
+                # If yes, then add the line in list
                 list_of_results.append((line.rstrip()))
     # Return list containing lines where string is found
     return list_of_results
@@ -20,20 +19,24 @@ def only_protein_names (list_name):
         stripped = x.split(' ', 1)
         new_string = [x for x in stripped if ">" not in x]
         converted_list.append(new_string)
-        list_of_string = [''.join(element) for element in converted_list]
+        list_of_string = [''.join(element) for element in converted_list]   
     return (list_of_string)  
 
-def cut_down (list_name, word_replace):
-    #Only keeps the name of the protein
+def protein_no_organism(list_name):
+    newlist = []
+    for x in list_name:
+        new = x.split('[')[0]
+        newlist.append(new)
+    return newlist
+
+def Cut_down (list_name, replace):
     new_list = []
     for a_string in list_name:
-        #Replaces the line identifier with nothing
-        new_string = a_string.replace(word_replace, "")
+        new_string = a_string.replace(replace, "")
         new_list.append(new_string)
     return new_list
 
 def intersection (list1, list2):
-    #Find the proteins present in two lists (ie. 2 evironments)
     list1_as_set = set(list1)
     intersection = list1_as_set.intersection(list2)
     intersection_as_list = list(intersection)
@@ -85,38 +88,44 @@ def Nbr_of_sims (list_name):
 
 #extract organism names from genpept files
 
-baro_new_o = search_word_in_file("halo_sequence.gp", "ORIGIN")
-acid_new_o = search_word_in_file("acid_sequence.gp", "ORIGIN")
-alkali_new_o = search_word_in_file("alkali_sequence.gp", "ORIGIN")
-thermo_new_o = search_word_in_file("sequence_thermo3.gp", "ORIGIN")
-cryo_new_o = search_word_in_file("sequence_cryo.gp", "ORIGIN")
+baro_new_o = search_protein_in_file("baro_sequence.gp", "ORGANISM") #with 'baro_sequence.gp' being the genpept file obtained from NCBI with the protein information
+acid_new_o = search_protein_in_file("acid_sequence.gp", "ORGANISM")
+alkali_new_o = search_protein_in_file("alkali_sequence.gp", "ORGANISM")
+halo_new_o = search_protein_in_file("halo_sequence.gp", "ORGANISM")
+thermo_new_o = search_protein_in_file("sequence_thermo3.gp", "ORGANISM")
+cryo_new_o = search_protein_in_file("sequence_cryo.gp", "ORGANISM")
 
-baro_organisms = cut_down(baro_new_o, "ORIGIN  ")
-halo_organisms = cut_down(halo_new_o, "ORIGIN  ")
-acid_organisms = cut_down(acid_new_o, "ORIGIN  ")
-alkali_organisms = cut_down(alkali_new_o, "ORIGIN  ")
-thermo_organisms = cut_down(thermo_new_o, "ORIGIN  ")
-cryo_organisms = cut_down(cryo_new_o, "ORIGIN  ")
-
-#find number of organisms with proteins in five environment
-
-two_o = intersection(acid_organisms, halo_organisms
-three_o = intersection(two_o
+baro_organisms = Cut_down(baro_new_o, "  ORGANISM  ")
+halo_organisms = Cut_down(halo_new_o, "  ORGANISM  ")
+acid_organisms = Cut_down(acid_new_o, "  ORGANISM  ")
+alkali_organisms = Cut_down(alkali_new_o, "  ORGANISM  ")
+thermo_organisms = Cut_down(thermo_new_o, "  ORGANISM  ")
+cryo_organisms = Cut_down(cryo_new_o, "  ORGANISM  ")
 
 #extract protein names from genpept files
 
-baro_new = search_word_in_file("halo_sequence.gp", "DEFINITION")
-acid_new = search_word_in_file("acid_sequence.gp", "DEFINITION")
-alkali_new = search_word_in_file("alkali_sequence.gp", "DEFINITION")
-thermo_new = search_word_in_file("sequence_thermo3.gp", "DEFINITION")
-cryo_new = search_word_in_file("sequence_cryo.gp", "DEFINITION")
+baro_new = search_protein_in_file('baro_sequence.fasta', '>') #with 'baro_sequence.fasta' being the fasta file obtained from NCBI with protein sequences
+acid_new = search_protein_in_file('acid_sequence.fasta', '>')
+alkali_new = search_protein_in_file('alkaliphile_sequence.fasta', '>')
+halo_new = search_protein_in_file('halo_sequence.fasta', '>')
+cryo_new = search_protein_in_file('cryo_sequence.fasta', '>')
+thermo_new = search_protein_in_file('thermo_sequence.fasta', '>')
 
-baro_proteins = cut_down(baro_new, "DEFINITION  ")
-halo_proteins = cut_down(halo_new, "DEFINITION  ")
-acid_proteins = cut_down(acid_new, "DEFINITION  ")
-alkali_proteins = cut_down(alkali_new, "DEFINITION  ")
-thermo_proteins = cut_down(thermo_new, "DEFINITION  ")
-cryo_proteins = cut_down(cryo_new, "DEFINITION  ")
+baro_proteins = only_protein_names(baro_new)
+acid_proteins = only_protein_names(acid_new)
+alkali_proteins = only_protein_names(alkali_new)
+halo_proteins = only_protein_names(halo_new)
+cryo_proteins = only_protein_names(cryo_new)
+thermo_proteins = only_protein_names(thermo_new)
+
+#Make list of proteins without organism title
+
+baro_no_org = protein_no_organism(baro_proteins)
+acid_no_org = protein_no_organism(acid_proteins)
+alkali_no_org = protein_no_organism(alkali_proteins)
+cryo_no_org = protein_no_organism(cryo_proteins)
+halo_no_org = protein_no_organism(halo_proteins)
+thermo_no_org = protein_no_organism(thermo_proteins)
 
 #find number of proteins in 5 environments (without barophiles)
 
@@ -127,9 +136,26 @@ five_p = intersection(four_p, alkali_proteins)
 
 print(len(five_p))
 
+#Make lists containing the protein sequences of all six environments
+
+dict_fasta_acid = ReadFastaFile("acid_sequence.fasta")
+dict_fasta_alkali = ReadFastaFile("alkaliphile_sequence.fasta")
+dict_fasta_baro = ReadFastaFile("baro_sequence.fasta")
+dict_fasta_cryo = ReadFastaFile("cryo_sequence.fasta")
+dict_fasta_halo = ReadFastaFile("halo_sequence.fasta")
+dict_fasta_thermo = ReadFastaFile("thermo_sequence.fasta")
+dict_fasta_thermo2 = ReadFastaFile("thermo test.fasta")
+
+list_fasta_acid = list(dict_fasta_acid.values())
+list_fasta_alkali = list(dict_fasta_alkali.values())
+list_fasta_baro = list(dict_fasta_baro.values())
+list_fasta_cryo = list(dict_fasta_cryo.values())
+list_fasta_halo = list(dict_fasta_halo.values())
+list_fasta_thermo = list(dict_fasta_thermo.values())
+
 ##############################################################################
 
-#Venn Diagrm
+#Venn Diagram
 pip install venn
     
 from venn import venn
@@ -143,7 +169,7 @@ cmaps = ["cool", list("rgb"), "plasma", "viridis", "Set1"]
 letters = iter(ascii_uppercase)
 
 for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
-    dataset_dict = {
+    dataset_dict1 = {
     "acidophile" : set(acid_proteins),
     "alkaliphile" : set(alkali_proteins),
     #"barophile" : set(baro_proteins), ## This one is optional. WIth 6 environments, the venn obtained are messy and hard to interpret
@@ -151,7 +177,56 @@ for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
     "thermophile" : set(thermo_proteins),
     "cryophile" : set(cryo_proteins)
     }
-    venn(dataset_dict, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
+    venn(dataset_dict1, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
 
+for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
+    dataset_dict2 = {
+    "acidophile" : set(list_fasta_acid),
+    "alkaliphile" : set(list_fasta_alkali),
+    #"barophile" : set(list_fasta_baro), ## This one is optional. WIth 6 environments, the venn obtained are messy and hard to interpret
+    "halophile" : set(list_fasta_halo),
+    "thermophile" : set(list_fasta_thermo),
+    "cryophile" : set(list_fasta_cryo)
+    }
+    venn(dataset_dict2, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
+
+for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
+    dataset_dict3 = {
+    "acidophile" : set(acid_no_org),
+    "alkaliphile" : set(alkali_no_org),
+    #"barophile" : set(baro_no_org), ## This one is optional. WIth 6 environments, the venn obtained are messy and hard to interpret
+    "halophile" : set(halo_no_org),
+    "thermophile" : set(thermo_no_org),
+    "cryophile" : set(cryo_no_org)
+    }
+    venn(dataset_dict3, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
+    
 ##############################################################################
+
+#Get list of number of similar protein by sequence
+
+acid_numbers = get_proteins_and_twins('acid_compare.txt') #with 'acid_compare.txt' being the file obtained from blast+ after comapring the acid fasta file to the extremophile db
+acid_nbr_list = Convert(acid_numbers)
+average_acid = sum(acid_nbr)/len(acid_nbr)
+
+alkali_numbers = get_proteins_and_twins('alkali_compare.txt')
+alkali_nbr_list = Convert(alkali_numbers)
+average_alkali = sum(alkali_nbr)/len(alkali_nbr)
+
+baro_numbers = get_proteins_and_twins('baro_compare.txt')
+baro_nbr_list = Convert(baro_numbers)
+average_baro = sum(baro_nbr)/len(baro_nbr)
+
+cryo_numbers = get_proteins_and_twins('cryo_compare.txt')
+cryo_nbr_list = Convert(cryo_numbers)
+average_cryo = sum(cryo_nbr)/len(cryo_nbr)
+
+halo_numbers = get_proteins_and_twins('halo_compare.txt')
+halo_nbr_list = Convert(halo_numbers)
+average_halo = sum(halo_nbr)/len(halo_nbr)
+
+thermo_numbers = get_proteins_and_twins('thermo_compare.txt ')
+thermo_nbr_list = Convert(thermo_numbers)
+average_thermo = sum(thermo_nbr)/len(thermo_nbr)
+
 
