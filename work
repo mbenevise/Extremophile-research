@@ -157,14 +157,12 @@ pip install venn
 from venn import venn
 from matplotlib.pyplot import subplots
 from itertools import chain, islice
-from string import ascii_uppercase
 from numpy.random import choice
 
 _, bot_axs = subplots(ncols=2, nrows=1, figsize=(100, 50))
-cmaps = ["cool", list("rgb"), "plasma", "viridis", "Set1"]
-letters = iter(ascii_uppercase)
+cmaps = [ "plasma", "viridis"]
 
-for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
+for n_sets, cmap, ax in zip(range(2, 4), cmaps, chain(bot_axs)):
     dataset_dict1 = {
     "acidophile" : set(acid_proteins),
     "alkaliphile" : set(alkali_proteins),
@@ -175,7 +173,7 @@ for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
     }
     venn(dataset_dict1, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
 
-for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
+for n_sets, cmap, ax in zip(range(2, 4), cmaps, chain(bot_axs)):
     dataset_dict2 = {
     "acidophile" : set(list_fasta_acid),
     "alkaliphile" : set(list_fasta_alkali),
@@ -186,16 +184,16 @@ for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
     }
     venn(dataset_dict2, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
 
-for n_sets, cmap, ax in zip(range(2, 7), cmaps, chain(top_axs, bot_axs)):
-    dataset_dict3 = {
-    "acidophile" : set(acid_no_org),
-    "alkaliphile" : set(alkali_no_org),
-    #"barophile" : set(baro_no_org), ## This one is optional. WIth 6 environments, the venn obtained are messy and hard to interpret
-    "halophile" : set(halo_no_org),
-    "thermophile" : set(thermo_no_org),
-    "cryophile" : set(cryo_no_org)
+for n_sets, cmap, ax in zip(range(2, 4), cmaps, chain(bot_axs)):
+    dataset_dict = {
+    "acidophile" : set(acid_organisms),
+    "alkaliphile" : set(alkali_organisms),
+    #"barophile" : set(baro_proteins),
+    "halophile" : set(halo_organisms),
+    "thermophile" : set(thermo_organisms),
+    "cryophile" : set(cryo_organisms)
     }
-    venn(dataset_dict3, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
+    venn(dataset_dict, cmap=cmap, fontsize=50, legend_loc="upper left", ax=ax)
     
 ##############################################################################
 
