@@ -38,19 +38,13 @@ def Cut_down (list_name, replace):
         new_list.append(new_string)
     return new_list
 
-def intersection (list1, list2):
-    list1_as_set = set(list1)
+def intersection (list1, list2): # Create a list only with elements present in two lists provided
+    list1_as_set = set(list1) # turn into set so that duplicate elements only appear once
     intersection = list1_as_set.intersection(list2)
     intersection_as_list = list(intersection)
     return intersection_as_list
 
-def file_to_string (filename):
-    file = open(filename)
-    line = file.read().replace("\n", "")
-    file.close()
-    return(line)
-
-def get_proteins_and_twins (filename):
+def get_proteins_and_twins (filename): # Get a string with all the proteins similar to proteins put in Blast
     headings = []
     test = ''
     start = 0
@@ -58,31 +52,31 @@ def get_proteins_and_twins (filename):
     with open(filename) as f:
         for ln in f:
             if start == 1:
-                if ln.startswith('>'):
+                if ln.startswith('>'): # When the character '>' is read, do not append line to new list 'headings', continue reading file
                     start = 0
                     continue
                 headings.append(ln.rstrip())
-                string = ''.join(headings)
-            if ln.startswith('Sequences producing significant alignments:'):
+                string = ''.join(headings) # Join the list into a string
+            if ln.startswith('Sequences producing significant alignments:'): # When this is read, start appending lines to list
                 start = 1
-            if ln.startswith('Query= '):
+            if ln.startswith('Query= '): # Append lines starting with Query= to list
                 headings.append(ln.rstrip())
             my_results = [x for x in headings if x]
-            my_string = ' $ '.join(my_results)
+            my_string = ' $ '.join(my_results) # Add dollar sign between elements to use as delimiter or counting function
     return my_string
 
-def Convert(string):
+def Convert(string): # Create list containing only the name of the similar proteins rather than the whole lines
     li = list(string.split("Query= "))
     clean_list = [x for x in li if x]
     return clean_list
 
-def Nbr_of_sims (list_name):
+def Nbr_of_sims (list_name): # Creates list with the number of similar proteins for each protein in a fasta file ran in Blast
     list_of_nbr_similarities = []
     new_nbr = ''
     for i in list_name:
         new_nbr = i.count('$')
         list_of_nbr_similarities.append(new_nbr)
-    for n in range(len(list_of_nbr_similarities)-1):
+    for n in range(len(list_of_nbr_similarities)-1): # Remove 1 from every number in the list except the last one (which contains one less $ than other proteins)
         list_of_nbr_similarities[n] = list_of_nbr_similarities[n] - 1
     return list_of_nbr_similarities
 
