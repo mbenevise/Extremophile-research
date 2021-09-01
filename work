@@ -15,24 +15,26 @@ def search_protein_in_file(file_name, string_to_search):
 
 def only_protein_names (list_name):
     converted_list = []
+    # Change each element in list
     for x in list_name:
-        stripped = x.split(' ', 1)
-        new_string = [x for x in stripped if ">" not in x]
+        stripped = x.split(' ', 1) # splits one string into two elements, seperated by the first space in the string
+        new_string = [x for x in stripped if ">" not in x] # only keeps lines with the character '>' in
         converted_list.append(new_string)
         list_of_string = [''.join(element) for element in converted_list]   
     return (list_of_string)  
 
-def protein_no_organism(list_name):
+def protein_no_organism(list_name): # Remove the organism name from the protein name in a fasta file
     newlist = []
     for x in list_name:
-        new = x.split('[')[0]
+        new = x.split('[')[0] # Removes part of string after the character '['
         newlist.append(new)
     return newlist
 
 def Cut_down (list_name, replace):
     new_list = []
+    # Change each element in list
     for a_string in list_name:
-        new_string = a_string.replace(replace, "")
+        new_string = a_string.replace(replace, "") # Remove any string from every element in list
         new_list.append(new_string)
     return new_list
 
