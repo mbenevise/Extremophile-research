@@ -18,7 +18,7 @@ def only_protein_names (list_name):
     # Change each element in list
     for x in list_name:
         stripped = x.split(' ', 1) # splits one string into two elements, seperated by the first space in the string
-        new_string = [x for x in stripped if ">" not in x] # only keeps lines with the character '>' in
+        new_string = [x for x in stripped if ">" not in x] # only keeps lines without the character '>' in
         converted_list.append(new_string)
         list_of_string = [''.join(element) for element in converted_list]   
     return (list_of_string)  
@@ -43,6 +43,26 @@ def intersection (list1, list2): # Create a list only with elements present in t
     intersection = list1_as_set.intersection(list2)
     intersection_as_list = list(intersection)
     return intersection_as_list
+    
+def ReadFastaFile(filename): # Read fasta file and store sequences in a dictionnary
+    fileObj = open(filename, 'r')
+    sequences = dict()
+    seqFragments = []
+    for line in fileObj:
+        if line.startswith('>'): # If line starts with '>' join contents of list seqFragments are put into a dictionary
+            if seqFragments:
+                sequence = ''.join(seqFragments)
+                sequences[id] = sequence
+            seqFragments = []
+            id = line.rstrip()[1:]
+        else:  # If line doesn't start with '>' it is part of a protein sequence. Lines are stored in list seqFragments
+            seq = line.rstrip()
+            seqFragments.append(seq)
+    if seqFragments: # contents of the list seqFragments are put into a dictionary
+        sequence = ''.join(seqFragments)
+        sequences[id] = sequence
+    fileObj.close()
+    return sequences # The dictionary has the name of the proteins as keys and protein sequences as values
 
 def get_proteins_and_twins (filename): # Get a string with all the proteins similar to proteins put in Blast
     headings = []
@@ -79,6 +99,14 @@ def Nbr_of_sims (list_name): # Creates list with the number of similar proteins 
     for n in range(len(list_of_nbr_similarities)-1): # Remove 1 from every number in the list except the last one (which contains one less $ than other proteins)
         list_of_nbr_similarities[n] = list_of_nbr_similarities[n] - 1
     return list_of_nbr_similarities
+
+def get_percentage (filename): #Find percent positive higher than 90% in output file of blastp
+    newlist = []
+    with open (filename) as f:
+        for line in f:
+            if int(float(x)) >= 90: # only appends values equal over to 90
+                newlist.append(x)
+        return newlist
 
 ##############################################################################
 
